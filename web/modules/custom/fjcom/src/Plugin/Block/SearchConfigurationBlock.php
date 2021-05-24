@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Drupal\fjcom\Pllugin\Block;
+namespace Drupal\fjcom\Plugin\Block;
 
 
 use Drupal\Core\Block\BlockBase;
@@ -17,14 +17,29 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   category = @Translation("Forms"),
  * )
  *
- * @package Drupal\fjcom\Pllugin\Block
+ * @package Drupal\fjcom\Plugin\Block
  */
 class SearchConfigurationBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
+  /**
+   * SearchConfigurationBlock constructor.
+   *
+   * @param array $configuration
+   * @param $plugin_id
+   * @param $plugin_definition
+   */
   public function __construct(array $configuration, $plugin_id, $plugin_definition) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
   }
 
+  /**
+   * @param \Symfony\Component\DependencyInjection\ContainerInterface $container
+   * @param array $configuration
+   * @param string $plugin_id
+   * @param mixed $plugin_definition
+   *
+   * @return \Drupal\fjcom\Plugin\Block\SearchConfigurationBlock|static
+   */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
     return new static(
       $configuration,
@@ -33,8 +48,13 @@ class SearchConfigurationBlock extends BlockBase implements ContainerFactoryPlug
     );
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function build() {
-    // TODO: Implement build() method.
+    $form = \Drupal::formBuilder()->getForm('Drupal\fjcom\Form\ParsingSettingsForm');
+
+    return $form;
   }
 
 }

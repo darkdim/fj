@@ -37,7 +37,7 @@ class SearchConfigurationForm extends ConfigFormBase {
     $form['site_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Site URL'),
-      '#description' => $this->t(''),
+      '#description' => $this->t('Site URL description'),
       '#required' => TRUE,
       '#default_value' => $config->get('site_url') ?: 'https://fivejars.com',
     ];
@@ -45,7 +45,7 @@ class SearchConfigurationForm extends ConfigFormBase {
     $form['search_title'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Search title'),
-      '#description' => $this->t(''),
+      '#description' => $this->t('Search title description'),
       '#required' => TRUE,
       '#default_value' => $config->get('search_title') ?: 'Top PHP Static Code Analysis Tools for Drupal',
     ];
