@@ -1,0 +1,10 @@
+fjcom.settings:
+  type: config_object
+  label: 'Fjcom search configuration settings'
+  mapping:
+    site_url:
+      type: path
+      label: 'The URL path for the search'
+    search_title:
+      type: string
+      label: 'String to show in title'

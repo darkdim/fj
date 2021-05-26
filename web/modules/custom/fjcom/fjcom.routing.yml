@@ -1,4 +1,4 @@
-fjcom.sconfig_form:
+fjcom.search_config_form:
   path: '/admin/config/search-configuration'
   defaults:
     _form: Drupal\fjcom\Form\SearchConfigurationForm

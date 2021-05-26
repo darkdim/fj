@@ -18,7 +18,7 @@ class SearchConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
-    return ['fjcom.search_configuration'];
+    return ['fjcom.settings'];
   }
 
   /**
@@ -32,14 +32,14 @@ class SearchConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('fjcom.search_configuration');
+    $config = $this->config('fjcom.settings');
 
     $form['site_url'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Site URL'),
       '#description' => $this->t('Site URL description'),
       '#required' => TRUE,
-      '#default_value' => $config->get('site_url') ?: 'https://fivejars.com',
+      '#default_value' => $config->get('site_url'),
     ];
 
     $form['search_title'] = [
@@ -47,7 +47,7 @@ class SearchConfigurationForm extends ConfigFormBase {
       '#title' => $this->t('Search title'),
       '#description' => $this->t('Search title description'),
       '#required' => TRUE,
-      '#default_value' => $config->get('search_title') ?: 'Top PHP Static Code Analysis Tools for Drupal',
+      '#default_value' => $config->get('search_title'),
     ];
 
     return parent::buildForm($form, $form_state);
@@ -66,7 +66,7 @@ class SearchConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('fjcom.search_configuration')
+    $this->config('fjcom.settings')
       ->set('site_url', $form_state->getValue('site_url'))
       ->set('search_title', $form_state->getValue('search_title'))
       ->save();

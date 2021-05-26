@@ -37,7 +37,11 @@ class ParsingSettingsForm extends FormBase {
   }
 
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    // TODO: Implement submitForm() method.
+    $config = $this->config('fjcom.settings');
+
+    $http_client = \Drupal::httpClient();
+    $response = $http_client->request('GET', 'https://fivejars.com/sitemap.xml');
+    $status_code = $response->getStatusCode();
   }
 
 }

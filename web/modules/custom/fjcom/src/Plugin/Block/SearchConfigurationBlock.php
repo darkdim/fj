@@ -5,7 +5,9 @@ namespace Drupal\fjcom\Plugin\Block;
 
 
 use Drupal\Core\Block\BlockBase;
+use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\fjcom\Form\ParsingSettingsForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -22,14 +24,24 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class SearchConfigurationBlock extends BlockBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The form builder.
+   *
+   * @var \Drupal\Core\Form\FormBuilderInterface
+   */
+  protected $formBuilder;
+
+  /**
    * SearchConfigurationBlock constructor.
    *
    * @param array $configuration
    * @param $plugin_id
    * @param $plugin_definition
+   * @param \Drupal\Core\Form\FormBuilderInterface $form_builder
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, FormBuilderInterface $form_builder) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
+
+    $this->formBuilder = $form_builder;
   }
 
   /**
@@ -44,7 +56,8 @@ class SearchConfigurationBlock extends BlockBase implements ContainerFactoryPlug
     return new static(
       $configuration,
       $plugin_id,
-      $plugin_definition
+      $plugin_definition,
+      $container->get('form_builder')
     );
   }
 
@@ -52,9 +65,9 @@ class SearchConfigurationBlock extends BlockBase implements ContainerFactoryPlug
    * {@inheritdoc}
    */
   public function build() {
-    $form = \Drupal::formBuilder()->getForm('Drupal\fjcom\Form\ParsingSettingsForm');
-
-    return $form;
+    return [
+      'form' => $this->formBuilder->getForm(ParsingSettingsForm::class),
+    ];
   }
 
 }
