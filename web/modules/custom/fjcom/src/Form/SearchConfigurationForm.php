@@ -4,6 +4,7 @@
 namespace Drupal\fjcom\Form;
 
 
+use Drupal\Component\Utility\UrlHelper;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 
@@ -57,7 +58,16 @@ class SearchConfigurationForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
-    $site_url = $form_state->getValue('site_url'); // todo: add validation
+    $site_url = $form_state->getValue('site_url');
+    if (!UrlHelper::isValid($site_url, TRUE)) {
+      $form_state->setErrorByName('site_url', $this->t('Check that the URL is valid.'));
+    }
+    if (parse_url($site_url, PHP_URL_SCHEME) != 'https') {
+      $form_state->setErrorByName('site_url', $this->t('Check that the URL is contains HTTPS.'));
+    }
+    if (mb_substr($site_url, -1) == '/') {
+      $form_state->setErrorByName('site_url', $this->t('Check that the URL without last slash character.'));
+    }
 
     parent::validateForm($form, $form_state);
   }
