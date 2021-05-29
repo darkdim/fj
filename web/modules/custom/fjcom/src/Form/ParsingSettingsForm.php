@@ -7,13 +7,14 @@ namespace Drupal\fjcom\Form;
 use Drupal\Component\Utility\Html;
 use Drupal\Core\Batch\BatchBuilder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\fjcom\URLBatchImport;
-use Drupal\node\Entity\Node;
+use Drupal\fjcom\ImportUrlEvent;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 
 /**
@@ -38,17 +39,35 @@ class ParsingSettingsForm extends FormBase {
    */
   protected $batchBuilder;
 
+  /**
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
   protected $entityTypeManager;
+
+  /**
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $moduleHandler;
+
+  /**
+   * @var \Symfony\Component\EventDispatcher\EventDispatcherInterface
+   */
+  protected $eventDispatcher;
 
   /**
    * ParsingSettingsForm constructor.
    *
    * @param \GuzzleHttp\ClientInterface $http_client
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
+   * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    */
-  public function __construct(ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager) {
+  public function __construct(ClientInterface $http_client, EntityTypeManagerInterface $entity_type_manager, ModuleHandlerInterface $module_handler, EventDispatcherInterface $event_dispatcher) {
     $this->httpClient = $http_client;
     $this->batchBuilder = new BatchBuilder();
     $this->entityTypeManager = $entity_type_manager;
+    $this->moduleHandler = $module_handler;
+    $this->eventDispatcher = $event_dispatcher;
   }
 
   /**
@@ -57,7 +76,9 @@ class ParsingSettingsForm extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('http_client'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('module_handler'),
+      $container->get('event_dispatcher')
     );
   }
 
@@ -133,6 +154,10 @@ class ParsingSettingsForm extends FormBase {
    *
    * @param $feeds
    * @param array $context
+   *
+   * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
+   * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Entity\EntityStorageException
    */
   public function importUrls($feeds, array &$context) {
     if (!isset($context['results']['imported'])) {
@@ -178,7 +203,7 @@ class ParsingSettingsForm extends FormBase {
     $image_name = array_pop($twitter_image);
     $file = file_save_data(file_get_contents($meta_tags['twitter:image']), 'public://' . substr($image_name, 0, strpos($image_name, '?')));
     $storage = $this->entityTypeManager->getStorage('node');
-    $node = $storage->create([
+    $data = [
       'type' => 'article',
       'title' => $title,
       'body' => [
@@ -190,8 +215,15 @@ class ParsingSettingsForm extends FormBase {
         'alt' => $title,
         'title' => $title,
       ],
-    ]);
+    ];
+    // Allow other module to alter the import url.
+    $this->moduleHandler->alter('import_url', $data);
+    /** @var \Drupal\node\NodeInterface $node */
+    $node = $storage->create($data);
     $node->save();
+    $event = new ImportUrlEvent();
+    $event->setObject($node);
+    $event = $this->eventDispatcher->dispatch(ImportUrlEvent::EVENT, $event);
   }
 
   /**
@@ -232,7 +264,7 @@ class ParsingSettingsForm extends FormBase {
   /**
    * @param mixed $response
    */
-  public function setResponse($response): void {
+  public function setResponse($response) {
     $this->response = $response;
   }
 

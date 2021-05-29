@@ -1,0 +1,22 @@
+<?php
+
+/**
+ * Implements hook_import_url_alter().
+ */
+function fjcom_import_url_alter(array &$info) {
+  $info['title'] .= ' by Fjcom';
+}
+
+/**
+ * Implements hook_mail().
+ */
+function fjcom_mail($key, &$message, $params) {
+  switch ($key) {
+    case 'fjcom_importUrl':
+      $message['from'] = \Drupal::config('system.site')->get('mail');
+      $message['subject'] = t('There is match title on import URL.');
+      $message['body'][] = $params['message'];
+
+      break;
+  }
+}
