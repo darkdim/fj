@@ -1,0 +1,6 @@
+services:
+  fjcom.import_url_subscriber:
+    class: Drupal\fjcom\EventSubscriber\FjcomImportUrlSubscriber
+    arguments: ['@config.factory']
+    tags:
+      - { name: event_subscriber }

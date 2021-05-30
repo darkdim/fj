@@ -1,0 +1,7 @@
+fjcom.search_config_form:
+  path: '/admin/config/search-configuration'
+  defaults:
+    _form: Drupal\fjcom\Form\SearchConfigurationForm
+    _title: 'Search configuration'
+  requirements:
+    _permission: 'administer fjcom search configuration'
