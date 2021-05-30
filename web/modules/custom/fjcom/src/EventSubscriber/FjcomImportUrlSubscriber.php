@@ -8,7 +8,6 @@ use Drupal\Component\Render\FormattableMarkup;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\fjcom\ImportUrlEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelEvents;
 
 class FjcomImportUrlSubscriber implements EventSubscriberInterface {
 

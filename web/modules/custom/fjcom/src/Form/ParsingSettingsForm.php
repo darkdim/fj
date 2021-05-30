@@ -223,7 +223,7 @@ class ParsingSettingsForm extends FormBase {
     $node->save();
     $event = new ImportUrlEvent();
     $event->setObject($node);
-    $event = $this->eventDispatcher->dispatch(ImportUrlEvent::EVENT, $event);
+    $this->eventDispatcher->dispatch(ImportUrlEvent::EVENT, $event);
   }
 
   /**
@@ -328,6 +328,7 @@ class ParsingSettingsForm extends FormBase {
       } catch (TransportExceptionInterface $e) {
       }
     }
+
     return $this->response;
   }
 
